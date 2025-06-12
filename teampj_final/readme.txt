@@ -5,7 +5,10 @@
 python -m venv venv
 .\venv\Scripts\activate
 
-2. app.py 실행
+2.패키지 설치
+pip install -r requirements.txt
+
+3. app.py 실행
 python .\app.py
 
-3.웹앱에서 검색어 입력
+4.웹앱에서 검색어 입력
