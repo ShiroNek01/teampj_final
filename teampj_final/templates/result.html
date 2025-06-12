@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>검색 결과</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .sidebar {
+      transition: transform 0.3s ease-in-out;
+    }
+    .sidebar-hidden {
+      transform: translateX(-100%) !important;
+    }
+    .sidebar-visible {
+      transform: translateX(0) !important;
+    }
+  </style>
+</head>
+<body class="bg-black text-white min-h-screen flex flex-col">
+
+  <!-- 상단 네비게이션 -->
+  <header class="w-full flex items-center justify-between px-6 py-4 bg-black">
+    <div class="flex items-center gap-4">
+      <button id="menuButton" onclick="toggleMenu()" class="text-white focus:outline-none z-50 relative">
+        <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+      <a href="main.html" class="hover:text-gray-300"><h1 class="text-2xl font-bold">BeautifulView</h1></a>
+    </div>
+  </header>
+
+  <!-- 사이드바 메뉴 -->
+  <div id="sidebar" class="sidebar sidebar-hidden fixed top-0 left-0 w-64 h-full bg-gray-900 shadow-lg z-40 p-6 pt-24">
+    <h2 class="text-xl font-semibold mb-6">Menu</h2>
+    <ul class="space-y-4">
+      <li><a href="main.html" class="hover:underline">홈</a></li>
+    </ul>
+  </div>
+
+  <!-- 검색창 -->
+  <div class="w-full flex justify-center mt-10 px-4">
+    <form id="searchForm" action="/result" method="get"
+          class="flex items-center border border-gray-700 rounded-full shadow-md overflow-hidden w-full max-w-xl bg-[#1E293B]">
+      <input
+        id="searchInput"
+        name="query"
+        type="text"
+        placeholder="어느 장소를 찾으시나요?"
+        class="flex-1 px-5 py-3 text-base text-white bg-[#1E293B] placeholder-gray-400 focus:outline-none"
+        onkeydown="handleKey(event)"
+      />
+      <button type="submit" class="bg-[#334155] hover:bg-[#475569] px-4 py-3 flex items-center justify-center transition">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M21 21l-4.35-4.35M17 10a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+      </button>
+    </form>
+  </div>
+
+  <!-- 장소 카드 목록 -->
+  <div class="w-full max-w-2xl px-4 mt-10 mb-28 flex flex-col gap-6 mx-auto">
+
+    {% if error %}
+      <div class="col-span-full text-center mt-12 text-red-400 text-lg font-semibold">
+         {{ error }}
+      </div>
+    {% endif %}
+
+    {% if results %}
+      {% for place_name, place in results.items() %}
+        <div class="bg-gray-900 rounded-lg overflow-hidden hover:scale-105 transform transition shadow-md">
+          <!-- 이미지 src 처리 로직 개선 -->
+          <img
+      src="{% if place.images %}
+             {% if place.images[0].startswith('//') %}
+              {{ 'https:' + place.images[0] }}
+             {% elif place.images[0].startswith('http') %}
+             {{ place.images[0] }}
+             {% else %}
+               {{ url_for('static', filename=place.images[0]) }}
+             {% endif %}
+           {% else %}
+             {{ url_for('static', filename='default.png') }}
+           {% endif %}"
+      alt="{{ place_name }}"
+      class="w-full h-48 object-cover"
+    />
+    <!-- DEBUG: 이미지 리스트 찍어보기 -->
+    <pre class="text-xs text-gray-400"></pre>
+          <div class="p-3">
+            <div class="text-lg font-semibold">{{ place_name }}</div>
+            <div class="text-sm text-gray-400 mb-1">{{ place.location }} · {{ place.operate }}</div>
+            <div class="flex flex-wrap gap-1 mb-2">
+              {% for tag in place.themes %}
+                <span class="px-2 py-0.5 text-xs bg-gray-700 text-white rounded-full">{{ tag }}</span>
+              {% endfor %}
+            </div>
+            <div class="text-xs text-gray-400">{{ place.contact }}</div>
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p class="text-gray-400 text-center col-span-full mt-12">"{{ query }}"에 대한 결과가 없습니다.</p>
+    {% endif %}
+  </div>
+
+
+  <!-- 푸터 -->
+  <footer class="w-full text-center py-4 text-sm text-gray-500 bg-black mt-auto">
+    ⓒ 2025.05.05.
+  </footer>
+
+  <!-- 메뉴 토글 및 검색 submit 핸들러 -->
+  <script>
+    function toggleMenu() {
+      const sidebar = document.getElementById('sidebar');
+      sidebar.classList.toggle('sidebar-visible');
+      sidebar.classList.toggle('sidebar-hidden');
+    }
+
+    function handleKey(event) {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        document.getElementById("searchForm").submit();
+      }
+    }
+  </script>
+</body>
+</html>

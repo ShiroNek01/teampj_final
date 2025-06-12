@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>BeautifulView</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .sidebar {
+      transition: transform 0.3s ease-in-out;
+    }
+    .sidebar-hidden {
+      transform: translateX(-100%);
+    }
+    .sidebar-visible {
+      transform: translateX(0);
+    }
+  </style>
+</head>
+<body class="overflow-x-hidden bg-black text-white min-h-screen flex flex-col">
+
+  <!-- 햄버거 메뉴 -->
+  <button id="menuButton" onclick="toggleMenu()" class="fixed top-6 left-6 z-50 bg-transparent p-2">
+    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M4 6h16M4 12h16M4 18h16" />
+    </svg>
+  </button>
+
+  <!-- 사이드 메뉴 -->
+  <div id="sidebar" class="sidebar sidebar-hidden fixed top-0 left-0 w-64 h-full bg-gray-900 shadow-lg z-40 p-6 pt-28">
+    <h2 class="text-xl font-semibold mb-6">Menu</h2>
+    <ul class="space-y-4">
+      <li><a href="main.html" class="hover:underline">홈</a></li>
+    </ul>
+  </div>
+
+  <!-- 이미지 자동 전환 섹션 -->
+  <section class="relative w-full h-[85vh] overflow-hidden">
+    <img id="mainImage" src="{{ url_for('static', filename='명소1.png') }}"
+         class="absolute top-0 left-0 w-full h-full object-cover object-center transition-opacity duration-700"
+         alt="명소 이미지" />
+
+    <!-- 로고 -->
+    <div class="absolute top-6 left-20 z-30">
+      <div class="text-4xl font-bold text-white drop-shadow-lg">BeautifulView</div>
+    </div>
+
+    <!-- 지도 버튼 -->
+    <a href="https://map.naver.com/p?c=15.00,0,0,0,dh" target="_blank" rel="noopener noreferrer"
+       class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 
+              w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-xl overflow-hidden z-30">
+      <img src="{{ url_for('static', filename='네이버지도.png') }}" alt="네이버 지도 버튼" class="w-full h-full object-contain" />
+    </a>
+  </section>
+
+  <!-- 검색창을 검은 배경 중앙에 배치 -->
+  <section class="bg-black flex flex-col items-center justify-center h-[30vh]">
+    <form id="searchForm" action="/result" method="GET"
+          class="flex items-center border border-gray-600 rounded-full shadow-md overflow-hidden w-full max-w-2xl bg-gray-800">
+      <input
+        id="searchInput"
+        name="query"
+        type="text"
+        placeholder="어느 장소를 찾으시나요?"
+        class="flex-1 px-5 py-3 focus:outline-none text-base text-white bg-gray-800 placeholder-gray-400"
+        onkeydown="handleKey(event)"
+      />
+      <button type="submit" class="bg-gray-700 hover:bg-gray-600 px-4 py-3 flex items-center justify-center transition">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M21 21l-4.35-4.35M17 10a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+      </button>
+    </form>
+
+  <!-- 푸터 고정 -->
+  <footer class="w-full text-center py-4 text-sm text-gray-500 bg-black mt-auto">
+    2025.05.10
+  </footer>
+
+  <!-- JavaScript -->
+  <script>
+    const images = [
+      "{{ url_for('static', filename='명소1.png') }}",
+      "{{ url_for('static', filename='명소2.png') }}",
+      "{{ url_for('static', filename='명소3.png') }}"
+    ];
+
+    let currentIndex = 0;
+    const mainImage = document.getElementById('mainImage');
+
+    setInterval(() => {
+      currentIndex = (currentIndex + 1) % images.length;
+      mainImage.style.opacity = 0;
+      setTimeout(() => {
+        mainImage.src = images[currentIndex];
+        mainImage.style.opacity = 1;
+      }, 300);
+    }, 4000);
+
+    function toggleMenu() {
+      const sidebar = document.getElementById('sidebar');
+      sidebar.classList.toggle('sidebar-visible');
+      sidebar.classList.toggle('sidebar-hidden');
+    }
+
+    function handleKey(event) {
+      if (event.key === 'Enter') {
+        // 자동 제출
+      }
+    }
+  </script>
+</body>
+</html>
